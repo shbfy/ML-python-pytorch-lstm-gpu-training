@@ -40,7 +40,7 @@ train, val = torchtext.datasets.IMDB.splits(TEXT, LABEL)
 TEXT.build_vocab(train, vectors=torchtext.vocab.GloVe(name='6B', dim=EMBEDDING_DIM), max_size=MAX_VOCAB_SIZE)
 LABEL.build_vocab(train)
 
-train_iter, val_iter = data.BucketIterator.splits((train, val), batch_size=BATCH_SIZE)
+train_iter, val_iter = data.BucketIterator.splits((train, val), batch_size=BATCH_SIZE, device='cuda')
 train_iter.repeat = False
 val_iter.repeat = False
 
@@ -63,8 +63,8 @@ for epoch in range(epochs):
     train_correct = 0
     for batch in tqdm(train_iter):
         optimizer.zero_grad()
-        text, target = batch.text.cuda(), batch.label.cuda()
-        output = net(text.cuda())
+        text, target = batch.text, batch.label
+        output = net(text)
 
         # calculate loss
         loss = criterion(output, target)
@@ -85,7 +85,7 @@ for epoch in range(epochs):
     net.eval()
     val_correct = 0
     for batch in val_iter:
-        text, target = batch.text.cuda(), batch.label.cuda()
+        text, target = batch.text, batch.label
         output = net(text)
         loss = criterion(output, target)
         val_loss += loss.data.item()

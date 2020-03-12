@@ -6,6 +6,5 @@ scikit-learn==0.22.1
 transformers==2.5.1
 pytorch==1.4
 tensorboard==2.1.0
-tensorboard==2.1.0
 torchtext==0.5.0
 
