@@ -1,9 +1,13 @@
 # coding=utf-8
+import json
+import os
 import sys
 
+import jsonpickle
 import torch
 import torch.onnx as torch_onnx
 import torchtext
+from sklearn.metrics import f1_score, accuracy_score, classification_report
 from torch import nn
 from torch import optim
 from torchtext import data
@@ -18,7 +22,7 @@ torch.backends.cudnn.deterministic = True
 
 # Define hyper parameters
 LEARNING_RATE = 0.001
-BATCH_SIZE = 4
+BATCH_SIZE = 8
 MAX_VOCAB_SIZE = 10000
 N_CLASSES = 2
 EMBEDDING_DIM = 300
@@ -27,7 +31,7 @@ N_LAYERS = 1
 # Step 1: Set up target metrics for evaluating training
 
 # Define a target loss metric to aim for
-target_accuracy = 0.9
+target_accuracy = 0.7
 
 # instantiate classifier and scaler
 
@@ -100,14 +104,37 @@ for epoch in range(epochs):
 
 # Step 3: Evaluate the quality of the trained model
 # Only persist the model if we have passed our desired threshold
-if val_accuracy < target_accuracy:
+if val_accuracy / 100 < target_accuracy:
     sys.exit('Training failed to meet threshold')
 
 # Step 4: Persist the trained model in ONNX format in the local file system along with any significant metrics
 
+# persist preprocessing steps
+with open('processor.json', 'w') as f:
+    f.write(jsonpickle.dumps(TEXT))
+
 # persist model
 rand_text, _ = next(iter(train_iter))
 torch_onnx.export(net,
-                  rand_text,
+                  rand_text[[0]],  # Keep batch size to 1
                   'model.onnx',
-                  verbose=False)
+                  verbose=False,
+                  input_names=['input1'],
+                  output_names=['output1'],
+                  dynamic_axes={'input1': {0: 'batch'}, 'output1': {0: 'batch'}})
+
+# calculate set of quality metrics
+y_pred, y_true = net.predict(val_iter)
+
+f1_metric = f1_score(y_true, y_pred)
+accuracy_metric = accuracy_score(y_true, y_pred)
+print(classification_report(y_true, y_pred))
+
+# write metrics
+if not os.path.exists("metrics"):
+    os.mkdir("metrics")
+
+with open("metrics/f1.metric", "w+") as f:
+    json.dump(f1_metric, f)
+with open("metrics/accuracy.metric", "w+") as f:
+    json.dump(accuracy_metric, f)
