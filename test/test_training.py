@@ -51,10 +51,9 @@ def test_export_makes_prediction():
     output_name = sess.get_outputs()[0].name
     input_len = model.graph.input[0].type.tensor_type.shape.dim[1].dim_value
 
-    doc = "This is a test of how great the classifer is!"
+    doc = "That was a really great movie!"
     processed = TEXT.process(([TEXT.preprocess(doc)])).cuda()
     padded = nn.ConstantPad1d((0, input_len - processed.shape[1]), 0)(processed)
     result = sess.run([output_name], {input_name: padded.numpy()})
 
-    print(result)
     assert type(result) == list
