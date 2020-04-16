@@ -1,4 +1,4 @@
-buildPack: ml-python-training-gpu
+buildPack: ml-python-gpu-training
 pipelineConfig:
 
   pipelines:
