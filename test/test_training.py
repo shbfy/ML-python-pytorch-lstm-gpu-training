@@ -7,6 +7,7 @@ import onnxruntime as ort
 import torchtext
 from torch import nn
 
+
 def test_metrics_export():
     assert os.path.exists("metrics/accuracy.metric")
     assert os.path.exists("metrics/f1.metric")
