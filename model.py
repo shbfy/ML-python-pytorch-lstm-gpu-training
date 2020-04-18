@@ -21,7 +21,8 @@ class LSTM(nn.Module):
         self.hidden_dim = hidden_dim
         self.layer_dim = layer_dim
 
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, layer_dim, bidirectional=False, dropout=dropout_proba, batch_first=True)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, layer_dim, bidirectional=False, dropout=dropout_proba,
+                            batch_first=True)
         self.dropout = nn.Dropout(dropout_proba)
 
         self.fc1 = nn.Linear(hidden_dim, 32)
