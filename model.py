@@ -15,7 +15,6 @@ class LSTM(nn.Module):
         :param vocab_size: Size of the vocabulary containing unique words
         :param embedding_dim: Embedding length of word embeddings in the input
         :param dropout_proba: Probability of dropout
-        :param output_dim: Number of classes to predict
         """
         super(LSTM, self).__init__()
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
@@ -23,7 +22,7 @@ class LSTM(nn.Module):
         self.layer_dim = layer_dim
 
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, layer_dim,
-                            bidirectional=False, dropout=dropout_proba, 
+                            bidirectional=False, dropout=dropout_proba,
                             batch_first=True)
         self.dropout = nn.Dropout(dropout_proba)
 

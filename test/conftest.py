@@ -4,7 +4,7 @@ import shutil
 
 def pytest_sessionstart(session):
     print("\nPre-session setup... "
-         	"This may take a while as a new model is training.")
+          "This may take a while as a new model is training.")
     import app  # noqa
 
 
