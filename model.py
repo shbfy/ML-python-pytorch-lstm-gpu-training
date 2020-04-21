@@ -6,13 +6,14 @@ from torch import nn
 # Long Short Term Memory Network
 class LSTM(nn.Module):
 
-    def __init__(self, layer_dim, hidden_dim, vocab_size, embedding_dim, output_dim, dropout_proba=0.2):
+    def __init__(self, layer_dim, hidden_dim, vocab_size, embedding_dim,
+                 output_dim, dropout_proba=0.2):
         """
         Initalise the model with
         :param layer_dim: Number of recurrent layers
         :param hidden_dim: Size of features in hidden state `h`
         :param vocab_size: Size of the vocabulary containing unique words
-        :param embedding_dim: Embedding length of word embeddings in the input `x`
+        :param embedding_dim: Embedding length of word embeddings in the input
         :param dropout_proba: Probability of dropout
         :param output_dim: Number of classes to predict
         """
@@ -21,7 +22,8 @@ class LSTM(nn.Module):
         self.hidden_dim = hidden_dim
         self.layer_dim = layer_dim
 
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, layer_dim, bidirectional=False, dropout=dropout_proba,
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, layer_dim,
+                            bidirectional=False, dropout=dropout_proba, 
                             batch_first=True)
         self.dropout = nn.Dropout(dropout_proba)
 
@@ -36,10 +38,12 @@ class LSTM(nn.Module):
         :return: Output from network
         """
         # Initialize hidden state with zeros
-        h0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).requires_grad_().cuda()
+        h0 = torch.zeros(self.layer_dim, x.size(0),
+                         self.hidden_dim).requires_grad_().cuda()
 
         # Initialize cell state with zeros
-        c0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).requires_grad_().cuda()
+        c0 = torch.zeros(self.layer_dim, x.size(0),
+                         self.hidden_dim).requires_grad_().cuda()
 
         x = self.word_embeddings(x)
 

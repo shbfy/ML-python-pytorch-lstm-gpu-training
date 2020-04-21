@@ -54,7 +54,8 @@ def test_export_makes_prediction():
 
     doc = "That was a really great movie!"
     processed = TEXT.process(([TEXT.preprocess(doc)])).cuda()
-    padded = nn.ConstantPad1d((0, input_len - processed.shape[1]), 0)(processed)
+    padded = nn.ConstantPad1d(
+        (0, input_len - processed.shape[1]), 0)(processed)
     result = sess.run([output_name], {input_name: padded.numpy()})
 
     assert type(result) == list
