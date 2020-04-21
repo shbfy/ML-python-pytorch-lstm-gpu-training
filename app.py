@@ -41,16 +41,18 @@ LABEL = data.LabelField(dtype=torch.long, batch_first=True, sequential=False)
 train, val = torchtext.datasets.IMDB.splits(TEXT, LABEL)
 
 # build the GloVe embeddings
-TEXT.build_vocab(train, vectors=torchtext.vocab.GloVe(name='6B', dim=EMBEDDING_DIM), max_size=MAX_VOCAB_SIZE)
+TEXT.build_vocab(train, vectors=torchtext.vocab.GloVe(name='6B', 
+    dim=EMBEDDING_DIM), max_size=MAX_VOCAB_SIZE)
 LABEL.build_vocab(train)
 
-train_iter, val_iter = data.BucketIterator.splits((train, val), batch_size=BATCH_SIZE, device='cuda')
+train_iter, val_iter = data.BucketIterator.splits((train, val), 
+    batch_size=BATCH_SIZE, device='cuda')
 train_iter.repeat = False
 val_iter.repeat = False
 
 # Instantiate the classifier
-net = LSTM(layer_dim=N_LAYERS, hidden_dim=100, vocab_size=len(TEXT.vocab), embedding_dim=EMBEDDING_DIM,
-           output_dim=N_CLASSES, dropout_proba=0.2).cuda()
+net = LSTM(layer_dim=N_LAYERS, hidden_dim=100, vocab_size=len(TEXT.vocab),
+ embedding_dim=EMBEDDING_DIM, output_dim=N_CLASSES, dropout_proba=0.2).cuda()
 
 # Define loss function and optimiser
 criterion = nn.CrossEntropyLoss()
@@ -99,15 +101,18 @@ for epoch in range(epochs):
     val_loss /= len(val_iter)
     val_accuracy = 100 * val_correct / len(val_iter.dataset)
 
-    print(f"Epoch {epoch + 1} :: Train/Loss {round(train_loss, 3)} :: Train/Accuracy {round(train_accuracy, 3)}")
-    print(f"Epoch {epoch + 1} :: Val/Loss {round(val_loss, 3)} :: Val/Accuracy {round(val_accuracy, 3)}")
+    print(f"Epoch {epoch + 1} :: Train/Loss {round(train_loss, 3)} :: "
+        "Train/Accuracy {round(train_accuracy, 3)}")
+    print(f"Epoch {epoch + 1} :: Val/Loss {round(val_loss, 3)} :: "
+        "Val/Accuracy {round(val_accuracy, 3)}")
 
 # Step 3: Evaluate the quality of the trained model
 # Only persist the model if we have passed our desired threshold
 if val_accuracy / 100 < target_accuracy:
     sys.exit('Training failed to meet threshold')
 
-# Step 4: Persist the trained model in ONNX format in the local file system along with any significant metrics
+# Step 4: Persist the trained model in ONNX format in the local file system 
+# along with any significant metrics
 
 # persist preprocessing steps
 with open('processor.json', 'w') as f:
@@ -121,7 +126,8 @@ torch_onnx.export(net,
                   verbose=False,
                   input_names=['input1'],
                   output_names=['output1'],
-                  dynamic_axes={'input1': {0: 'batch'}, 'output1': {0: 'batch'}})
+                  dynamic_axes={'input1': {0: 'batch'},
+                  'output1': {0: 'batch'}})
 
 # calculate set of quality metrics
 y_pred, y_true = net.predict(val_iter)
